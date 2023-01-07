@@ -1,0 +1,18 @@
+{
+  "name": "todo-11",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body": "^5.1.0",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.20",
+    "parser": "^0.1.4"
+  }
+}
