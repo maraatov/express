@@ -1,11 +1,8 @@
-// import express from 'express'
-// import path from 'path'
-
 const express = require('express')
 const path = require('path')
 const bodyPorser = require('body-parser')
 
-let todolist = [
+let todolists = [
     {
         id: '1',
         title: 'My todolist'
@@ -19,8 +16,10 @@ let todolist = [
 
 let tasks = {
     '1': [{id: '123', title: 'do adwad', isDone: false},
-        {id: '223', title: 'do things', isDone: false}],
-    '1': []
+        {id: '223', title: 'do things', isDone: true}],
+
+    '2': [{id: '3332', title: 'task2', isDone: false},
+        {id: '232', title: 'task3', isDone: true}],
 }
 
 const app = express()
@@ -31,31 +30,70 @@ app.use(express.static(path.resolve(__dirname, 'build')));
 const port = 4747
 
 app.get('/api/todolists', (req, res) => {
-    res.json({todolist})
+    res.json({todolists})
 })
 
-app.get('/api/todolists/:id/tasks/:taskId', (req, res) => {
+app.get('/api/todolists/:id/tasks', (req, res) => {
     const {id} = req.params
-    const taskOfTodolist = tasks[id]
     if (id) {
-        res.json({tasks: taskOfTodolist})
+        res.json({tasks: tasks[id]})
     } else {
         res.json({errorMessage: 'Not Found!'})
+    }
+})
+
+app.post('/api/todolists/:id/tasks', (req, res) => {
+    const {id} = req.params
+    if (id) {
+        const newTask = {id: Date.now().toString(), title: req.body.title}
+        tasks[id].push(newTask)
+        res.json({tasks: newTask})
+    } else {
+        res.json({errorMessage: 'don not create task'})
+    }
+})
+
+app.put('/api/todolists/:id/tasks/:taskId', (req, res) => {
+    const id = req.params.id
+    const taskId = req.params.taskId
+    if (id) {
+        tasks[id] = tasks[id].map(t => t.id === taskId ? {...t, title: req.body.title} : {...t})
+        res.json({tasks})
+    } else {
+        res.json({errorMessage: 'sorry man('})
+    }
+})
+
+app.delete('/api/todolists/:id/tasks/:taskId', (req, res) => {
+    const id = req.params.id
+    const taskId = req.params.taskId
+    if (id) {
+        tasks[id] = tasks[id].filter(t => t.id !== taskId)
+        res.json({tasks})
+    } else {
+        res.json({errorMessage: 'бля не получилось удалить'})
     }
 })
 
 app.post('/api/todolists', (req, res) => {
     const id = Date.now().toString()
     const newTodolist = {id, title: req.body.title}
-    todolist.push(newTodolist)
+    todolists.push(newTodolist)
     tasks[id] = []
     res.json({newTodolist})
 })
 
 app.delete('/api/todolists/:id', (req, res) => {
     const {id} = req.params
-    const newTodolists = todolist.filter(t => t.id !== id)
-    res.json(newTodolists)
+    let newTodolist = todolists.filter(t => t.id !== id)
+    todolists = newTodolist
+    res.json({newTodolist})
+})
+
+app.put('/api/todolists/:id', (req, res) => {
+    const {id} = req.params
+    todolists = todolists.map(t => t.id === id ? {...t, title: req.body.title} : {...t})
+    res.json({todolists})
 })
 
 
